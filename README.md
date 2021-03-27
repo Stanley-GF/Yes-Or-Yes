@@ -7,3 +7,7 @@ Execute admin command with forcing "yes" windows button (for be admin)
 Ask windows privilege every time "no" is pressed for force the user to press yes and have a admin process in his computer.
 
 ![x](https://cdn.discordapp.com/attachments/822550531905421322/825478094084767744/unknown.png)
+
+# Important 
+ 
+I was boring, it was 10:20 if u ned elp create a issue.
